@@ -1,19 +1,19 @@
-package net.peacefulcraft.templateus;
+package net.peacefulcraft.mzr;
 
 import java.util.logging.Level;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.ChatColor;
-import net.peacefulcraft.templateus.commands.ExampleCommand;
-import net.peacefulcraft.templateus.config.MainConfiguration;
-import net.peacefulcraft.templateus.listeners.PlayerJoinListener;
-public class Templateus extends JavaPlugin {
+import net.peacefulcraft.mzr.commands.MzrAdmin;
+import net.peacefulcraft.mzr.config.MainConfiguration;
+import net.peacefulcraft.mzr.listeners.PlayerJoinListener;
+public class Mzr extends JavaPlugin {
   
-  public static final String messagingPrefix = ChatColor.GREEN + "[" + ChatColor.BLUE + "PCN" + ChatColor.GREEN + "]" + ChatColor.RESET;
+  public static final String messagingPrefix = ChatColor.GREEN + "[" + ChatColor.BLUE + "MZR" + ChatColor.GREEN + "]" + ChatColor.RESET;
 
-  private static Templateus _this;
-    public static Templateus _this() { return _this; }
+  private static Mzr _this;
+    public static Mzr _this() { return _this; }
 
   private static MainConfiguration configuration;
     public static MainConfiguration getConfiguration() { return configuration; }
@@ -23,7 +23,7 @@ public class Templateus extends JavaPlugin {
    * For improved reload behavior, use this as if it was the class constructor
    */
   public void onEnable() {
-    this._this = this;
+    _this = this;
     // Save default config if one does not exist. Then load the configuration into memory
     configuration = new MainConfiguration();
 
@@ -58,7 +58,7 @@ public class Templateus extends JavaPlugin {
   }
 
     private void setupCommands() {
-      this.getCommand("example").setExecutor(new ExampleCommand());
+      this.getCommand("mzradmin").setExecutor(new MzrAdmin());
     }
 
     private void setupEventListeners() {
