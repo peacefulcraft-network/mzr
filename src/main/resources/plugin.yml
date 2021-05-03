@@ -18,5 +18,5 @@ commands:
     usage: /<command> to use the example command.
 
 permissions:
-  mzr.admin.*:
+  mzr.admin:
     description: Gives access to all MZR commands
