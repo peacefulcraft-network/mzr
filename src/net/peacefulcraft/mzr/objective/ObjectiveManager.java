@@ -55,7 +55,7 @@ public class ObjectiveManager {
 			String objectiveName = YAMLFileFilter.removeExtension(f.getName());
 			this.objectiveNames.add(objectiveName);
 			try {
-				this.objectives.put(YAMLFileFilter.removeExtension(f.getName()), new Objective(f.getName()));
+				this.objectives.put(YAMLFileFilter.removeExtension(f.getName()), new Objective(objectiveName));
 				this.activeObjectiveNames.add(objectiveName);
 				Mzr._this().logDebug("Finished load sequence for configuration for objective " + objectiveName);
 			} catch (Exception ex) {
