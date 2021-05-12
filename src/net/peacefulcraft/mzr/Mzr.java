@@ -8,6 +8,8 @@ import net.md_5.bungee.api.ChatColor;
 import net.peacefulcraft.mzr.commands.MzrAdmin;
 import net.peacefulcraft.mzr.config.MainConfiguration;
 import net.peacefulcraft.mzr.listeners.PlayerDisconnectListener;
+import net.peacefulcraft.mzr.listeners.SignClickListener;
+import net.peacefulcraft.mzr.listeners.SignCreateListener;
 import net.peacefulcraft.mzr.objective.DataManager;
 import net.peacefulcraft.mzr.objective.ObjectiveManager;
 public class Mzr extends JavaPlugin {
@@ -73,6 +75,8 @@ public class Mzr extends JavaPlugin {
 	}
 	
 	private void setupEventListeners() {
+		this.getServer().getPluginManager().registerEvents(new SignClickListener(), this);
+		this.getServer().getPluginManager().registerEvents(new SignCreateListener(), this);
 		this.getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(), this);
 	}
 }
