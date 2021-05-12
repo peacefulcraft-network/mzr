@@ -21,7 +21,7 @@ public class Objective extends Configuration {
 	private Location lobbypoint;
 		public Location getLobbyPoint() { return this.lobbypoint; }
 
-	private ArrayList<Location> checkpoints;
+	private List<Location> checkpoints;
 		public List<Location> getCheckpoints() { return Collections.unmodifiableList(this.checkpoints); }
 		public Location getCheckpoint(Integer i) throws IndexOutOfBoundsException { return this.checkpoints.get(i); }
 
@@ -29,6 +29,7 @@ public class Objective extends Configuration {
 		super("objectives/" + name + ".yml");
 
 		this.name = name;
+		this.checkpoints = Collections.synchronizedList(new ArrayList<Location>());
 		this.loadValues();
 	}
 
@@ -113,9 +114,7 @@ public class Objective extends Configuration {
 		 * CompletableFuture allows caller to get feedback on whether result is comitted to disk or not.
 		 */
 		return CompletableFuture.supplyAsync(() -> {
-			synchronized(this.checkpoints) {
-				this.checkpoints.add(checkpoint);
-			}
+			this.checkpoints.add(checkpoint);
 
 			if (this.saveCheckpoints().join()) {
 				return this.checkpoints.size() - 1;
@@ -137,9 +136,7 @@ public class Objective extends Configuration {
 		 * CompletableFuture allows caller to get feedback on whether result is comitted to disk or not.
 		 */
 		return CompletableFuture.supplyAsync(() -> {
-			synchronized(this.checkpoints) {
-				this.checkpoints.add(i, checkpoint);
-			}
+			this.checkpoints.add(i, checkpoint);
 
 			if (this.saveCheckpoints().join()) {
 				return this.checkpoints.size() - 1;
@@ -161,9 +158,7 @@ public class Objective extends Configuration {
 		 * CompletableFuture allows caller to get feedback on whether result is comitted to disk or not.
 		 */
 		return CompletableFuture.supplyAsync(() -> {
-			synchronized(this.checkpoints) {
-				this.checkpoints.set(i, checkpoint);
-			}
+			this.checkpoints.set(i, checkpoint);
 
 			if (this.saveCheckpoints().join()) {
 				return true;
