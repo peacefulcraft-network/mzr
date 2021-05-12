@@ -3,7 +3,7 @@
 # https://bukkit.gamepedia.com/Plugin_YAML
 #
 name: MZR
-main: net.peacefulcraft.templateus.mzr
+main: net.peacefulcraft.mzr.Mzr
 version: 0.0.1
 api-version: 1.16
 website: https://www.peacefulcraft.net/
