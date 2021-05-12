@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import net.peacefulcraft.mzr.Mzr;
 import net.peacefulcraft.mzr.config.Configuration;
@@ -36,29 +34,16 @@ public class Objective extends Configuration {
 	/**
 	 * Method is intended to be used during object initialization only. Initialization is a SYNC process.
 	 * Calling this method outside of the constructor may throw ConcurrentModificationExceptions
+	 *
+	 * SupressWarning on cast from List<?> to List<Location>. This is controlled by Bukkits YAMl API so we
+	 * cast on the assumption the user has not tampered with the confirm and broke something. 
 	 */
+	@SuppressWarnings("unchecked")
 	private void loadValues() {
 		this.lobbypoint = this.config.getLocation("lobbypoint");
-		List<Map<?, ?>> pointMap = this.config.getMapList("checkpoints");
+		this.checkpoints = (List<Location>) this.config.getList("checkpoints");
 
-		pointMap.forEach(loc -> {
-			World w = Mzr._this().getServer().getWorld((String) loc.get("world"));
-			if (w == null) {
-				Mzr._this().logWarning("Objective " + name + " had invalid checkpoint location. Ignoring.");
-				
-				// Add null to keep correct CP indexes for remaining CPs
-				checkpoints.add(null);
-			}
-
-			this.checkpoints.add(
-				new Location(
-					w,
-					(Double) loc.get("x"),
-					(Double) loc.get("y"),
-					(Double) loc.get("z")
-				)
-			);
-		});
+		Mzr._this().logDebug("Found " + this.checkpoints.size() + " checkpoints in objective " + this.name);
 	}
 
 	/**
