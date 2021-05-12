@@ -26,7 +26,7 @@ public class Objective extends Configuration {
 		public Location getCheckpoint(Integer i) throws IndexOutOfBoundsException { return this.checkpoints.get(i); }
 
 	public Objective(String name) {
-		super("objectives/" + name);
+		super("objectives/" + name + ".yml");
 
 		this.name = name;
 		this.loadValues();

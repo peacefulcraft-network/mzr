@@ -31,7 +31,7 @@ public class ObjectiveProgress extends Configuration {
 	 * @throws RuntimeException On error loading objective progress data
 	 */
 	public ObjectiveProgress(UUID entity) throws RuntimeException {
-		super("progress/" + entity.toString());
+		super("progress/" + entity.toString() + ".yml");
 
 		this.entity = entity;
 		this.loadValues();
