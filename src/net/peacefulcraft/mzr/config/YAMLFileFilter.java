@@ -12,9 +12,9 @@ public class YAMLFileFilter implements FileFilter {
 
 	public static String removeExtension(String name) {
 		if (name.endsWith(".yml")) {
-			return name.substring(0, -4);
+			return name.substring(0, name.length()-4);
 		} else if (name.endsWith(".yaml")) {
-			return name.substring(0, -5);
+			return name.substring(0, name.length()-5);
 		}
 
 		return name;
