@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import net.md_5.bungee.api.ChatColor;
 import net.peacefulcraft.mzr.Mzr;
 import net.peacefulcraft.mzr.objective.DataManager;
 import net.peacefulcraft.mzr.objective.Objective;
@@ -28,13 +29,13 @@ public class SignClickListener implements Listener {
 			Sign s = (Sign) ev.getClickedBlock().getState();
 
 			// Check for MZR header
-			if (!s.getLine(0).contains("[MZR]")) { return; }
+			if (!ChatColor.stripColor(s.getLine(0)).equalsIgnoreCase("[MZR]")) { return; }
 
-			Objective objective = Mzr._this().getObjectiveManager().getObjective(s.getLine(1));
+			Objective objective = Mzr._this().getObjectiveManager().getObjective(ChatColor.stripColor(s.getLine(1)));
 			if (objective == null) { return; }
 
 			DataManager dm = Mzr._this().getDataManager();
-			String teleportTarget = s.getLine(2);
+			String teleportTarget = ChatColor.stripColor(s.getLine(2));
 
 			/**
 			 * Resume objective sign

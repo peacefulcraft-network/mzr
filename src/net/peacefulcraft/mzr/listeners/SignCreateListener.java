@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+import net.md_5.bungee.api.ChatColor;
 import net.peacefulcraft.mzr.Mzr;
 import net.peacefulcraft.mzr.objective.Objective;
 
@@ -16,10 +17,10 @@ public class SignCreateListener implements Listener {
 	public void onSignPlace(SignChangeEvent ev) {
 		if (ev.getLines().length == 0) { return; }
 
-		if (ev.getLine(0).contains("[MZR]")) {
+		if (ChatColor.stripColor(ev.getLine(0)).equalsIgnoreCase("[MZR]")) {
 			Objective objective = null;
 			try {
-				objective = Mzr._this().getObjectiveManager().getObjective(ev.getLine(1));
+				objective = Mzr._this().getObjectiveManager().getObjective(ChatColor.stripColor(ev.getLine(1)));
 			} catch (IndexOutOfBoundsException ex) {}
 			if (objective == null) {
 				ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Sign appears to be an MZR sign, but objective " + ev.getLine(1) + " is not recognized.");
@@ -28,7 +29,7 @@ public class SignCreateListener implements Listener {
 
 			String teleportTarget = "-1";
 			try {
-				teleportTarget = ev.getLine(2);
+				teleportTarget = ChatColor.stripColor(ev.getLine(2));
 			} catch (IndexOutOfBoundsException ex) {}
 			if (teleportTarget.equalsIgnoreCase("resume")) {
 				ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Sign syntax is valid.");
