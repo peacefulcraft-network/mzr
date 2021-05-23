@@ -123,6 +123,10 @@ public class MzrAdmin implements CommandExecutor, TabCompleter {
 			return true;
 		}
 
+		/**
+		 * mzra get [#]
+		 * Teleport executor to a checkpoint location
+		 */
 		if (objectiveAction.equalsIgnoreCase("get")) {
 			Location teleportLocation = null;
 			if (objectiveCheckpoint.equalsIgnoreCase("lobbypoint")) {
@@ -159,6 +163,10 @@ public class MzrAdmin implements CommandExecutor, TabCompleter {
 			return true;
 		}
 
+		/**
+		 * mzra set [#]
+		 * Add or replace an existing checkpoint
+		 */
 		if (objectiveAction.equalsIgnoreCase("set")) {
 			CompletableFuture<?> cf = null;
 			if (objectiveCheckpoint.equalsIgnoreCase("lobbypoint")) {
@@ -207,6 +215,35 @@ public class MzrAdmin implements CommandExecutor, TabCompleter {
 			return true;
 		}
 
+		/**
+		 * mzra remove [#]
+		 * Remove an existing checkpoint
+		 */
+		if (objectiveAction.equalsIgnoreCase("remove")) {
+			Integer index = Integer.valueOf(objectiveCheckpoint);
+
+			if (index < 0 || index >= objective.getCheckpoints().size()) {
+				sender.sendMessage(Mzr.messagingPrefix + "Objective " + objectiveName + " has no checkpoint " + objectiveCheckpoint);
+				return true;
+			}
+
+			CompletableFuture<Void> cf = objective.removeCheckpoint(index);
+			cf.exceptionally((ex) -> {
+				ex.printStackTrace();
+				Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+					sender.sendMessage(Mzr.messagingPrefix + "Error removing " + objectiveName + "(" + objectiveCheckpoint + ")");
+				});
+				return null;
+			});
+			cf.thenAccept((checkpointIndex) -> {
+				Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+					sender.sendMessage(Mzr.messagingPrefix + "Sucesfully deleted " + objectiveName + "(" + objectiveCheckpoint + ")");
+				});
+			});
+
+			return true;
+		}
+
 		return true;
 	}
 
@@ -232,6 +269,7 @@ public class MzrAdmin implements CommandExecutor, TabCompleter {
 
 			opts.add("get");
 			opts.add("set");
+			opts.remove("remove");
 			prefix = args[1];
 
 		} else if (args.length == 3) {
@@ -255,6 +293,12 @@ public class MzrAdmin implements CommandExecutor, TabCompleter {
 				}
 				opts.add(i.toString());
 				opts.add("lobbypoint");
+
+			} else if (args[1].equalsIgnoreCase("remove")) {
+				Integer numCheckpoints = obj.getCheckpoints().size();
+				for (Integer i=0; i<numCheckpoints; i++) {
+					opts.add(i.toString());
+				}
 			}
 
 		}
