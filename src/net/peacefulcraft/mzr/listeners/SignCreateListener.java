@@ -22,7 +22,7 @@ public class SignCreateListener implements Listener {
 				objective = Mzr._this().getObjectiveManager().getObjective(ev.getLine(1));
 			} catch (IndexOutOfBoundsException ex) {}
 			if (objective == null) {
-				ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Sign appears to be an MZR sign, but objective " + ev.getLine(0) + " is not recognized.");
+				ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Sign appears to be an MZR sign, but objective " + ev.getLine(1) + " is not recognized.");
 				return;
 			}
 
