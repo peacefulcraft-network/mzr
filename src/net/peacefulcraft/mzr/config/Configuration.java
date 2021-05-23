@@ -38,8 +38,8 @@ public abstract class Configuration {
 	protected void createDefaultConfiguration(Boolean empty) {
 		try {
 			this.configFile = new File(Mzr._this().getDataFolder(), this.configName);
-			if (!configFile.exists()) {
-				configFile.getParentFile().mkdirs();
+			if (!this.configFile.exists()) {
+				this.configFile.getParentFile().mkdirs();
 				if (empty) {
 					this.configFile.createNewFile();
 				} else {
@@ -63,7 +63,7 @@ public abstract class Configuration {
 	}
 
 	protected void loadConfiguration() {
-		config = YamlConfiguration.loadConfiguration(new File(Mzr._this().getDataFolder(), this.configName));
+		this.config = YamlConfiguration.loadConfiguration(this.configFile);
 	}
 
 	public void saveConfiguration() {

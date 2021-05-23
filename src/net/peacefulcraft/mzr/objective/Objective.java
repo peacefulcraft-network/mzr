@@ -24,7 +24,7 @@ public class Objective extends Configuration {
 		public Location getCheckpoint(Integer i) throws IndexOutOfBoundsException { return this.checkpoints.get(i); }
 
 	public Objective(String name) {
-		super("objectives/" + name + ".yml");
+		super("objective.yml", "objectives/" + name + ".yml");
 
 		this.name = name;
 		this.checkpoints = Collections.synchronizedList(new ArrayList<Location>());
@@ -40,10 +40,15 @@ public class Objective extends Configuration {
 	 */
 	@SuppressWarnings("unchecked")
 	private void loadValues() {
+		Mzr._this().logDebug("Loading config " + this.configFile.getAbsolutePath() + " with keys " + this.config.getKeys(false).toString());
 		this.lobbypoint = this.config.getLocation("lobbypoint");
-		this.checkpoints = (List<Location>) this.config.getList("checkpoints");
-
-		Mzr._this().logDebug("Found " + this.checkpoints.size() + " checkpoints in objective " + this.name);
+		List<Location> checkpoints = (List<Location>) this.config.getList("checkpoints");
+		if (checkpoints == null) {
+			Mzr._this().logDebug("Objective " + this.name + " has no configured checkpoints.");
+		} else {
+			this.checkpoints.addAll(checkpoints);
+			Mzr._this().logDebug("Found " + this.checkpoints.size() + " checkpoints in objective " + this.name);
+		}
 	}
 
 	/**
