@@ -48,10 +48,11 @@ public class SignClickListener implements Listener {
 					return null;
 				});
 				cf.thenAccept((objp) -> {
-					Map<String, String> objectiveData = objp.getObjectiveProgress(objective.getName());
+					Map<String, Object> objectiveData = objp.getObjectiveProgress(objective.getName());
 					
 					// No data for this objective, teleport to start point
 					if (objectiveData == null) {
+						Mzr._this().logDebug("Player " + ev.getPlayer() + " requested resume on objective " + objective.getName() + ", but had no previous save data. Creating.");
 						Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 							try {
 								ev.getPlayer().teleport(objective.getCheckpoint(0));
@@ -63,13 +64,11 @@ public class SignClickListener implements Listener {
 					}
 
 					// Data object exists, should have resume point
-					Integer resumeCheckpoint = Integer.valueOf(objectiveData.get("resume"));
-					if (resumeCheckpoint == null) {
-						resumeCheckpoint = 0;
-					}
+					Integer resumeCheckpoint = Integer.valueOf((String) objectiveData.get("resume"));
+					Mzr._this().logDebug("Player " + ev.getPlayer() + " requested resume on objective " + objective.getName() + ". Found they were on checkpoint " + resumeCheckpoint);
 					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 						try {
-							ev.getPlayer().teleport(objective.getCheckpoint(0));
+							ev.getPlayer().teleport(objective.getCheckpoint(resumeCheckpoint));
 						} catch (IndexOutOfBoundsException ex) {
 							ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Objective appears to be misconfigured. Please contact an admin.");
 						}
@@ -87,17 +86,20 @@ public class SignClickListener implements Listener {
 					return null;
 				});
 				cf.thenAccept((objp) -> {
-					Map<String, String> objectiveData = objp.getObjectiveProgress(objective.getName());
+					Map<String, Object> objectiveData = objp.getObjectiveProgress(objective.getName());
 					if (objectiveData == null) {
-						objectiveData = new HashMap<String, String>();
+						objectiveData = new HashMap<String, Object>();
 						objp.setObjectiveProgress(objective.getName(), objectiveData);
 					}
 
 					// Objective complete. Reached final checkpoint
-					if (checkpointNumber == objective.getCheckpoints().size()) {
+					if (checkpointNumber+1 == objective.getCheckpoints().size()) {
 						objectiveData.put("resume", "0");
 						objectiveData.put("complete" , "1");
-						ev.getPlayer().teleport(objective.getLobbyPoint());
+						Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+							ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Congratulations! You've completed " + objective.getName());
+							ev.getPlayer().teleport(objective.getLobbyPoint());
+						});
 
 					// Standard checkpoint number. Save new location
 					} else {

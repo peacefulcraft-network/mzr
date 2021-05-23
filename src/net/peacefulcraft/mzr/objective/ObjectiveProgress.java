@@ -3,8 +3,11 @@ package net.peacefulcraft.mzr.objective;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import org.bukkit.configuration.ConfigurationSection;
 
 import net.peacefulcraft.mzr.Mzr;
 import net.peacefulcraft.mzr.config.Configuration;
@@ -13,8 +16,8 @@ public class ObjectiveProgress extends Configuration {
 
 	private UUID entity;
 
-	private Map<String, Map<String, String>> objectives;
-		public Map<String, String> getObjectiveProgress(String objective) { return this.objectives.get(objective); }
+	private Map<String, Map<String, Object>> objectives;
+		public Map<String, Object> getObjectiveProgress(String objective) { return this.objectives.get(objective); }
 
 		/**
 		 * Replace objective progress data map for this profile.
@@ -22,7 +25,7 @@ public class ObjectiveProgress extends Configuration {
 		 * @param objective
 		 * @param data
 		 */
-		public void setObjectiveProgress(String objective, Map<String, String> data) { this.objectives.put(objective, data); }
+		public void setObjectiveProgress(String objective, Map<String, Object> data) { this.objectives.put(objective, data); }
 
 	
 	/**
@@ -34,23 +37,28 @@ public class ObjectiveProgress extends Configuration {
 		super("progress/" + entity.toString() + ".yml");
 
 		this.entity = entity;
+		this.objectives = new HashMap<String, Map<String, Object>>();
 		this.loadValues();
-		if (this.objectives == null) {
-			this.objectives = new HashMap<String, Map<String, String>>();
-		}
 	}
 
 	/**
 	 * Pull objective progress data out of YamlConfiguration
 	 * @throws RuntimeException When loaded YAML structure does match expected format
 	 * 
-	 * Supress unchecked cast because this is the easiest way to get the value out of the YAML class.
-	 * The alternative involves 2 iterattors and still makes assumptions about values on the inner map.
 	 */
-	@SuppressWarnings("unchecked")
 	private void loadValues() throws RuntimeException {
 		try {
-			this.objectives = (Map<String, Map<String, String>>) this.config.get("objectives");
+			/**
+			 * We need to enforce that the top left objectives map is made up of maps.
+			 * To do that we need to iterate over the top left because we can't enforce that
+			 * principle as casting the Map<String, Object> to Map<String, Map<String, Object>> is not allowed.
+			 */
+			ConfigurationSection cfs = this.config.getConfigurationSection("objectives");
+			Set<String> objs = cfs.getKeys(false);
+			objs.forEach((objectiveName) -> {
+				this.objectives.put(objectiveName, cfs.getConfigurationSection(objectiveName).getValues(true));
+			});
+
 		} catch (ClassCastException ex) {
 			ex.printStackTrace();
 			Mzr._this().logSevere("Error loading objective progress for entity " + this.entity.toString() + ". Is save file corrupt?");

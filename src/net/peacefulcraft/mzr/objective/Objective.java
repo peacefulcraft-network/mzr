@@ -54,15 +54,15 @@ public class Objective extends Configuration {
 		// Make sure file i/o happens off the Bukkit Thread
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				synchronized(this.checkpoints) {
-					this.config.set("checkpoints", this.checkpoints);
-				}
-
-				synchronized(this) {
-					this.config.set("lobbypoint", this.lobbypoint);
-				}
-
 				synchronized(this.config) {
+					synchronized(this.checkpoints) {
+						this.config.set("checkpoints", this.checkpoints);
+					}
+	
+					synchronized(this) {
+						this.config.set("lobbypoint", this.lobbypoint);
+					}
+
 					this.config.save(this.configFile);
 				}
 			} catch (IOException ex) {
@@ -135,9 +135,9 @@ public class Objective extends Configuration {
 	 * Update the checkpoint at index i.
 	 * @param i Index to update.
 	 * @param checkpoint Checkpoint location.
-	 * @return True on success, false if an error occured during file i/o.
+	 * @return Index of checkpoint (will match i). Returns -1 if an error occured.
 	 */
-	public CompletableFuture<Boolean> setCheckpoint(Integer i, Location checkpoint) {
+	public CompletableFuture<Integer> setCheckpoint(Integer i, Location checkpoint) {
 		/**
 		 * File IO is async so it is best to make the sync happen on another thread to prevent blocking Minecraft.
 		 * CompletableFuture allows caller to get feedback on whether result is comitted to disk or not.
@@ -146,10 +146,10 @@ public class Objective extends Configuration {
 			this.checkpoints.set(i, checkpoint);
 
 			if (this.saveCheckpoints().join()) {
-				return true;
+				return i;
 			}
 
-			return false;
+			return -1;
 		});
 	}
 
@@ -158,8 +158,11 @@ public class Objective extends Configuration {
 	 * @param i Index to remove.
 	 * @return True on success, false if an error occured during file i/o.
 	 */
-	public void removeCheckpoint(Integer i) {
-		this.checkpoints.remove((int) i);
-		this.saveCheckpoints();
+	public CompletableFuture<Void> removeCheckpoint(Integer i) {
+
+		return CompletableFuture.runAsync(() -> {
+			this.checkpoints.remove((int) i);
+			this.saveCheckpoints();
+		});
 	}
 }
