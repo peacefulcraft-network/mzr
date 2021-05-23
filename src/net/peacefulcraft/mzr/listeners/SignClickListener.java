@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.peacefulcraft.mzr.Mzr;
@@ -21,11 +22,10 @@ public class SignClickListener implements Listener {
 	
 	@EventHandler
 	public void onSignClick(PlayerInteractEvent ev) {
-		if (ev.getClickedBlock() instanceof Sign) {
-			Sign s = (Sign) ev.getClickedBlock();
+		if (ev.getAction() != Action.RIGHT_CLICK_BLOCK) { return; }
 
-			// All MZR signs have 3 lines, anything else can be ignored
-			if (s.getLines().length != 3) { return; }
+		if (ev.getClickedBlock().getState() instanceof Sign) {
+			Sign s = (Sign) ev.getClickedBlock().getState();
 
 			// Check for MZR header
 			if (!s.getLine(0).contains("[MZR]")) { return; }
