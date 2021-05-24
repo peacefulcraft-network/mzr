@@ -43,6 +43,7 @@ public class SignClickListener implements Listener {
 			if (teleportTarget.equalsIgnoreCase("resume")) {
 				CompletableFuture<ObjectiveProgress> cf = dm.getData(ev.getPlayer().getUniqueId());
 				cf.exceptionally((ex) -> {
+					ex.printStackTrace();
 					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 						ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Error reading datafile. Please contact an admin if this issue persists.");
 					});
@@ -53,7 +54,7 @@ public class SignClickListener implements Listener {
 					
 					// No data for this objective, teleport to start point
 					if (objectiveData == null) {
-						Mzr._this().logDebug("Player " + ev.getPlayer() + " requested resume on objective " + objective.getName() + ", but had no previous save data. Creating.");
+						Mzr._this().logDebug("Player " + ev.getPlayer().getName() + " requested resume on objective " + objective.getName() + ", but had no previous save data. Creating.");
 						Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 							try {
 								ev.getPlayer().teleport(objective.getCheckpoint(0));
@@ -66,7 +67,7 @@ public class SignClickListener implements Listener {
 
 					// Data object exists, should have resume point
 					Integer resumeCheckpoint = Integer.valueOf((String) objectiveData.get("resume"));
-					Mzr._this().logDebug("Player " + ev.getPlayer() + " requested resume on objective " + objective.getName() + ". Found they were on checkpoint " + resumeCheckpoint);
+					Mzr._this().logDebug("Player " + ev.getPlayer().getName() + " requested resume on objective " + objective.getName() + ". Found they were on checkpoint " + resumeCheckpoint);
 					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 						try {
 							ev.getPlayer().teleport(objective.getCheckpoint(resumeCheckpoint));
@@ -78,9 +79,16 @@ public class SignClickListener implements Listener {
 			
 			// Should be a checkpoint number, save progress to ObjectiveProgress file
 			} else {
-				Integer checkpointNumber = Integer.valueOf(teleportTarget);
+				Integer checkpointNumber;
+				try {
+					checkpointNumber = Integer.valueOf(teleportTarget);
+				} catch (NumberFormatException ex) {
+					return;
+				}
+				
 				CompletableFuture<ObjectiveProgress> cf = dm.getData(ev.getPlayer().getUniqueId());
 				cf.exceptionally((ex) -> {
+					ex.printStackTrace();
 					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
 						ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Error reading datafile. Please contact an admin if this issue persists.");
 					});
@@ -94,7 +102,7 @@ public class SignClickListener implements Listener {
 					}
 
 					// Objective complete. Reached final checkpoint
-					if (checkpointNumber+1 == objective.getCheckpoints().size()) {
+					if (checkpointNumber == objective.getCheckpoints().size()) {
 						objectiveData.put("resume", "0");
 						objectiveData.put("complete" , "1");
 						Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {

@@ -30,7 +30,7 @@ public class SignCreateListener implements Listener {
 			String teleportTarget = "-1";
 			try {
 				teleportTarget = ChatColor.stripColor(ev.getLine(2));
-			} catch (IndexOutOfBoundsException ex) {}
+			} catch (IndexOutOfBoundsException | NumberFormatException ex) {}
 			if (teleportTarget.equalsIgnoreCase("resume")) {
 				ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Sign syntax is valid.");
 			} else {

@@ -34,7 +34,7 @@ public class ObjectiveProgress extends Configuration {
 	 * @throws RuntimeException On error loading objective progress data
 	 */
 	public ObjectiveProgress(UUID entity) throws RuntimeException {
-		super("progress/" + entity.toString() + ".yml");
+		super("objective-progress.yml", "progress/" + entity.toString() + ".yml");
 
 		this.entity = entity;
 		this.objectives = new HashMap<String, Map<String, Object>>();
@@ -54,6 +54,10 @@ public class ObjectiveProgress extends Configuration {
 			 * principle as casting the Map<String, Object> to Map<String, Map<String, Object>> is not allowed.
 			 */
 			ConfigurationSection cfs = this.config.getConfigurationSection("objectives");
+			
+			// No objective data found
+			if (cfs == null) { return; }
+			
 			Set<String> objs = cfs.getKeys(false);
 			objs.forEach((objectiveName) -> {
 				this.objectives.put(objectiveName, cfs.getConfigurationSection(objectiveName).getValues(true));
