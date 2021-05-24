@@ -16,6 +16,9 @@ commands:
     description: MZR Administration and Setup
     permission-message:  Permission mzr.admin is required to use this command
     usage: /<command> to use the example command.
+  mzr:
+    description: Resume a given puzzle from the player's last checkpoint
+    usage: /<command> [Puzzle]
 
 permissions:
   mzr.admin:

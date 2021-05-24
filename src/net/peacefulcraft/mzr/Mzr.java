@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.ChatColor;
 import net.peacefulcraft.mzr.commands.MzrAdmin;
+import net.peacefulcraft.mzr.commands.MzrCommand;
 import net.peacefulcraft.mzr.config.MainConfiguration;
 import net.peacefulcraft.mzr.listeners.PlayerDisconnectListener;
 import net.peacefulcraft.mzr.listeners.SignClickListener;
@@ -72,6 +73,7 @@ public class Mzr extends JavaPlugin {
 	
 	private void setupCommands() {
 		this.getCommand("mzradmin").setExecutor(new MzrAdmin());
+		this.getCommand("mzr").setExecutor(new MzrCommand());
 	}
 	
 	private void setupEventListeners() {
