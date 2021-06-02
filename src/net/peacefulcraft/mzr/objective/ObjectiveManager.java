@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.bukkit.entity.Player;
+
 import net.peacefulcraft.mzr.Mzr;
 import net.peacefulcraft.mzr.config.YAMLFileFilter;
 
@@ -100,6 +102,53 @@ public class ObjectiveManager {
 	 */
 	public Objective getObjective(String objective) {
 		return this.objectives.get(objective);
+	}
+
+	public void playerResumeObjective(Player p, String objectiveName) {
+		Mzr._this().logDebug("Player requested resume on objective " + objectiveName);
+		Objective objective = Mzr._this().getObjectiveManager().getObjective(objectiveName);
+		if (objective == null) { throw new RuntimeException("Objective " + objectiveName + " does not exist."); }
+
+		CompletableFuture<ObjectiveProgress> cf = Mzr._this().getDataManager().getData(p.getUniqueId());
+
+		cf.exceptionally((ex) -> {
+			ex.printStackTrace();
+			Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+				p.sendMessage(Mzr.messagingPrefix + "Error reading datafile. Please contact an admin if this issue persists.");
+			});
+			return null;
+		});
+		cf.thenAccept((objp) -> {
+			Map<String, Object> objectiveData = objp.getObjectiveProgress(objectiveName);
+			
+			// No data for this objective, teleport to start point
+			if (objectiveData == null) {
+				Mzr._this().logDebug("Player " + p.getName() + " requested resume on objective " + objectiveName + ", but had no previous save data. Creating.");
+				Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+					try {
+						p.teleport(objective.getCheckpoint(0));
+					} catch (IndexOutOfBoundsException ex) {
+						p.sendMessage(Mzr.messagingPrefix + "Objective appears to be misconfigured. Please contact an admin.");
+					}
+				});
+				return;
+			}
+
+			// Data object exists, should have resume point
+			Integer resumeCheckpoint = Integer.valueOf((String) objectiveData.get("resume"));
+			Mzr._this().logDebug("Player " + p.getName() + " requested resume on objective " + objective.getName() + ". Found they were on checkpoint " + resumeCheckpoint);
+			Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
+				try {
+					p.teleport(objective.getCheckpoint(resumeCheckpoint));
+					p.setHealth(20);
+					p.setFireTicks(0);
+				} catch (IndexOutOfBoundsException ex) {
+					p.sendMessage(Mzr.messagingPrefix + "Objective appears to be misconfigured. Please contact an admin.");
+				}
+			});
+
+			objp.setLastObjective(objectiveName);
+		});
 	}
 
 	/**

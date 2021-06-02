@@ -9,6 +9,7 @@ import net.peacefulcraft.mzr.commands.MzrAdmin;
 import net.peacefulcraft.mzr.commands.MzrCommand;
 import net.peacefulcraft.mzr.config.MainConfiguration;
 import net.peacefulcraft.mzr.listeners.PlayerDisconnectListener;
+import net.peacefulcraft.mzr.listeners.PlayerInLavaListener;
 import net.peacefulcraft.mzr.listeners.SignClickListener;
 import net.peacefulcraft.mzr.listeners.SignCreateListener;
 import net.peacefulcraft.mzr.objective.DataManager;
@@ -80,5 +81,6 @@ public class Mzr extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new SignClickListener(), this);
 		this.getServer().getPluginManager().registerEvents(new SignCreateListener(), this);
 		this.getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerInLavaListener(), this);
 	}
 }

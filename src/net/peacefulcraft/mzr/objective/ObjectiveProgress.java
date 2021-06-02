@@ -15,7 +15,9 @@ import net.peacefulcraft.mzr.config.Configuration;
 public class ObjectiveProgress extends Configuration {
 
 	private UUID entity;
-
+	private String lastObjective;
+		public String getLastObjective() { return this.lastObjective; }
+		public void setLastObjective(String lastObjective) { this.lastObjective = lastObjective; }
 	private Map<String, Map<String, Object>> objectives;
 		public Map<String, Object> getObjectiveProgress(String objective) { return this.objectives.get(objective); }
 
@@ -37,6 +39,7 @@ public class ObjectiveProgress extends Configuration {
 		super("objective-progress.yml", "progress/" + entity.toString() + ".yml");
 
 		this.entity = entity;
+		this.lastObjective = null;
 		this.objectives = new HashMap<String, Map<String, Object>>();
 		this.loadValues();
 	}
@@ -47,6 +50,7 @@ public class ObjectiveProgress extends Configuration {
 	 * 
 	 */
 	private void loadValues() throws RuntimeException {
+		this.lastObjective = this.config.getString("last_objective");
 		try {
 			/**
 			 * We need to enforce that the top left objectives map is made up of maps.
@@ -75,6 +79,7 @@ public class ObjectiveProgress extends Configuration {
 	 * @return True on success, false if i/o error occured
 	 */
 	public CompletableFuture<Boolean> save() {
+		this.config.set("last_objective", this.lastObjective);
 		this.config.set("objectives", this.objectives);
 
 		return CompletableFuture.supplyAsync(() -> {

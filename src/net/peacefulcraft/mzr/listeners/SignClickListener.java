@@ -41,41 +41,7 @@ public class SignClickListener implements Listener {
 			 * Resume objective sign
 			 */
 			if (teleportTarget.equalsIgnoreCase("resume")) {
-				CompletableFuture<ObjectiveProgress> cf = dm.getData(ev.getPlayer().getUniqueId());
-				cf.exceptionally((ex) -> {
-					ex.printStackTrace();
-					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
-						ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Error reading datafile. Please contact an admin if this issue persists.");
-					});
-					return null;
-				});
-				cf.thenAccept((objp) -> {
-					Map<String, Object> objectiveData = objp.getObjectiveProgress(objective.getName());
-					
-					// No data for this objective, teleport to start point
-					if (objectiveData == null) {
-						Mzr._this().logDebug("Player " + ev.getPlayer().getName() + " requested resume on objective " + objective.getName() + ", but had no previous save data. Creating.");
-						Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
-							try {
-								ev.getPlayer().teleport(objective.getCheckpoint(0));
-							} catch (IndexOutOfBoundsException ex) {
-								ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Objective appears to be misconfigured. Please contact an admin.");
-							}
-						});
-						return;
-					}
-
-					// Data object exists, should have resume point
-					Integer resumeCheckpoint = Integer.valueOf((String) objectiveData.get("resume"));
-					Mzr._this().logDebug("Player " + ev.getPlayer().getName() + " requested resume on objective " + objective.getName() + ". Found they were on checkpoint " + resumeCheckpoint);
-					Mzr._this().getServer().getScheduler().runTask(Mzr._this(), () -> {
-						try {
-							ev.getPlayer().teleport(objective.getCheckpoint(resumeCheckpoint));
-						} catch (IndexOutOfBoundsException ex) {
-							ev.getPlayer().sendMessage(Mzr.messagingPrefix + "Objective appears to be misconfigured. Please contact an admin.");
-						}
-					});
-				});
+				Mzr._this().getObjectiveManager().playerResumeObjective(ev.getPlayer(), objective.getName());
 			
 			// Should be a checkpoint number, save progress to ObjectiveProgress file
 			} else {
